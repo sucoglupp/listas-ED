@@ -1,0 +1,136 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+struct no{
+    int info;
+    struct no *prox;
+};typedef struct no lista;
+
+lista *insere(lista *L, int x){
+    lista *novo = (lista*)malloc(sizeof(lista));
+    novo->info = x;
+    novo->prox = L;
+    return novo;
+}
+void imprime(lista *L){
+    if(L!=NULL){
+        printf("%d ", L->info);
+        imprime(L->prox);
+    }
+}
+lista *insereorde(lista *L, int x){
+    if((!L)||(L->info>=x)) return insere(L, x);
+    L->prox = insereorde(L->prox, x);
+    return L;
+}
+void inversao(lista* L, lista** Lref){
+    lista *inicio, *aux;
+    if (L == NULL) {
+        return;
+    }
+    inicio = L;
+    aux = inicio->prox;
+    if (aux == NULL){
+        *LRef = inicio;
+        return;
+    }
+    inversao(aux, LRef);
+    aux->prox = inicio;
+    aux->prox = NULL;
+}
+void reverse(lista** L) {
+    inversao(*L, L);
+}
+lista *inversaonova(lista *L){
+    lista *novo, *aux, *inicio, *L2;
+    aux = L;
+    if(aux!=NULL)
+        novo = (lista*)malloc(sizeof(lista));
+        novo->info = aux->info;
+        novo->prox = L2;
+    }
+    inversaonova(aux->prox);
+    
+}
+lista *copia(lista *L){
+    lista *aux, *L2;
+    aux = L;
+    while(aux!=NULL){
+        insere(L2,aux->info);
+        aux = aux->prox;
+    }
+    return L2;
+}
+lista removeelem(lista *L, int x){
+    lista *aux, *pre = L, *lixo;
+    while(aux!=NULL){
+        aux = pre;
+        if(aux->info==x){
+            if(aux==L){
+                L = L->prox;
+                lixo = pre;
+                free(lixo);
+                pre = L;
+            }else{
+                aux = aux->prox;
+                if(aux->info==x){
+                    pre->prox = aux->prox;
+                    free(aux);
+                }
+            }
+        }
+    }
+   return L;
+}
+int confereigual(lista *L1, lista *L2){
+    lista *aux=L1;
+    int a, b;
+    while(aux!=NULL){
+        a++;
+        aux=aux->prox;
+    }
+    while(L1->info==L2->info){
+        b++;
+        L1=L1->prox;
+        L2=L2->prox;
+    }
+    if(a==b){
+        return 1;
+    }else{
+        return 0;
+    }
+}
+lista *juntalista(lista *L1, lista *L2){
+    lista *aux;
+    while(aux!=NULL){
+        aux=aux->prox;
+    }
+    aux->prox = L2;
+    return L1;
+}
+
+
+
+
+
+
+
+
+
+
+int main(void){
+  lista *L = NULL;
+  int x;
+  do{
+    scanf("%d", &x);
+    if(x < 0) break;
+    L = insereorde(L, x);
+  }while(1);
+  imprime(L);
+  printf("\n");
+  reverse(&L);
+  imprime(L);
+
+  return 0;
+}
+

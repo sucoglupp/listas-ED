@@ -1,0 +1,160 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct arvbin{
+    int info;
+    struct arvbin *dir,*esq;
+}TAB;
+struct lse{
+  int info;
+  struct lse *prox;
+};
+
+typedef struct lse TLSE;
+TAB *cria(int info, TAB *esq, TAB *dir){
+    TAB *a;
+    a=(TAB*)malloc(sizeof(TAB));
+    a->info=info;
+    a->esq=esq;
+    a->dir=dir;
+    return a;
+}
+TAB *vet2ab(int *vet, int n){
+    if(n<=0) return NULL;
+    return cria(vet[n/2], vet2ab(vet,n/2), vet2ab(&vet[n/2 + 1], n- n/2 - 1));
+}
+void imp(TAB *a){
+    if(a){
+        imp(a->esq);
+        printf("%d ", a->info);
+        imp(a->dir);
+    }
+}
+TAB *busca(TAB *a, int x){
+    if((!a)||(a->info==x)) return a;
+    TAB *resp=busca(a->esq,x);
+    if(resp) return resp;
+    return busca(a->dir,x);
+}
+void libera(TAB *a){
+    if(a){
+        libera(a->esq);
+        libera(a->dir);
+        free(a);
+    }
+}
+TAB *copia(TAB *a){
+    TAB *b = (TAB*)malloc(sizeof(TAB));
+    if(!a) return NULL;
+    b->info=a->info;
+    b->esq=copia(a->esq);
+    b->dir=copia(a->dir);
+    return b;
+}
+TAB *espelho(TAB *a){
+    TAB *b = (TAB*)malloc(sizeof(TAB));
+    if(!a) return NULL;
+    b->info = a->info;
+    b->esq=espelho(a->dir);
+    b->dir=espelho(a->esq);
+    return b;
+}
+int maior(TAB *a){
+    if(!a) return 0;
+    int n = a->info;
+    int ln = maior(a->esq);
+    int rn = maior(a->dir);
+    if(ln>n) n=ln;
+    if(rn>n) n=rn;
+    return n;
+}
+TAB *menor(TAB *a){
+    if(!a) return a;
+    TAB *resp=menor(a->esq);
+    if((resp)&&(a->info<a->esq->info)) return resp;
+    if((resp)&&(a->info<a->dir->info)) return resp;
+    return menor(a->dir);
+
+}
+int igual (TAB* a1, TAB* a2){
+    if (a1 == NULL && a2 == NULL) {
+            return 1;
+    }
+    return (a1 && a2) && (a1->info == a2->info) &&
+            igual(a1->esq, a2->esq) &&
+            igual(a1->dir, a2->dir);
+}
+TLSE *jl(TLSE *l1, TLSE *l2){
+  if(!l2) return l1;
+  if(!l1) return l2;
+  l1->prox = jl(l1->prox, l2);
+  return l1;
+}
+TLSE* TLSE_insere(TLSE *l, int elem){
+  TLSE *novo = (TLSE *) malloc(sizeof(TLSE));
+  novo->prox = l;
+  novo->info = elem;
+  return novo;
+}
+TLSE* retpares(TAB *a){
+  if(!a) return NULL;
+  if(a->info%2 != 1) return jl(retpares(a->esq), retpares(a->dir));
+  else return TLSE_insere(jl(retpares(a->esq), retpares(a->dir)), a->info); 
+}
+void implista(TLSE *L){
+    while(L!=NULL){
+        printf("%d ",L->info);
+        L=L->prox;
+    }
+}
+int quantnakano(TAB *a){
+   if(!a) return 0;
+   else return(1+quantnakano(a->esq)+quantnakano(a->dir));
+}
+int quantfolhas(TAB *a){
+   if(!a) return 0;
+   else{
+       if((a->esq==NULL)&&(a->dir==NULL)){
+           return 1;
+       }else if(a->esq==NULL && a->dir==NULL){
+           return 1;
+       }else{
+           return (quantfolhas(a->esq)+quantfolhas(a->dir));
+       }
+   }
+}
+void colore(TAB *a){
+    if(!a) printf("arvore nula");
+    else if(a){
+        printf("%d-vermelho ", a->info);
+        imp(a->esq);
+        imp(a->dir);
+    }
+}
+int main(){
+    int n;
+    printf("digite tamanho do vetor: ");
+    scanf("%d", &n);
+    int i, vet[n];
+    for(i=0;i<n;i++) scanf("%d",&vet[i]);
+    TAB *a = vet2ab(vet,n);
+    imp(a);
+    printf("\n");
+    TAB *b = copia(a);
+    imp(b);
+    printf("\n");
+    TAB *c = espelho(a);
+    imp(c);
+    printf("\n");
+    int maio = maior(a);
+    printf("%d\n", maio);
+    printf("%d\n", igual(a,b));
+    printf("%d\n", igual(a,c));
+    TLSE *d = retpares(a);
+    implista(d);
+    printf("\n");
+    printf("%d nos internos\n", quantnakano(a)-1);
+    printf("%d folhas\n", quantfolhas(a));
+    
+}
