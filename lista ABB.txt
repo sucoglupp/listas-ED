@@ -1,0 +1,80 @@
+typedef struct ab{
+    int info;
+    struct ab *esq, *dir;
+}TABB;
+
+TABB *maior(TABB *a){
+    if((!a)||(!a->dir)) return a;
+    maior(a->dir);
+}
+TABB *menor(TABB *a){
+    if((!a)||(!a->esq)) return a;
+    menor(a->esq);
+}
+TABB *retira(TABB *a, int x){
+    if(!a) return a;
+    if(a->info>x) a->esq=retira(a->esq,x);
+    else if(a->info<x) a->dir=retira(a->dir);
+    else{
+        if((!a->esq)&&(!a->dir)){
+            free(a);
+            a=NULL;
+        }else if((!a->esq)||(!a->dir)){
+            TABB *temp = a;
+            if(!a->esq) a=a->dir;
+            else a=a->esq;
+            free temp;
+        }
+        else{
+            TABB *filho= a->esq;
+            while(filho->dir) filho=filho->dir;
+            a->info = filho->info;
+            filho->info = x;
+            a->esq = retira(a->esq,x);
+        }
+        return a;
+    }
+    
+}
+TABB *retiraimpar(TABB *a){
+    if(!a) return a;
+    if(a->info!=0){
+        retira(a, a->info);
+    }
+    retiraimpar(a->esq);
+    retiraimpar(a->dir);
+}
+struct lse{
+  int info;
+  struct lse *prox;
+};
+typedef struct lse TLSE;
+TLSE* TLSE_insere(TLSE *l, int elem){
+  TLSE *novo = (TLSE *) malloc(sizeof(TLSE));
+  novo->prox = l;
+  novo->info = elem;
+  return novo;
+}
+TLSE *traverse (TABB *a,TLSE *L){
+    if(!a) return NULL;                   // Ignore empty subtrees.
+    else{
+        traverse (a->esq, L);           // Do left subtree first.
+        TLSE_insere (L,a->info) ;      // Then current node.
+        traverse (a->dir, L);
+        return L;
+    }
+}
+int lista2vet(TLSE *a){
+    int vet[];
+    while(a){
+        vet[i] = a->info;
+        i++;
+        a = a->prox;
+    }
+    return vet;
+}
+int* mN(TABB*a, int N){
+    if(!a) printf("vetor vazio");
+    TLSE *L = traverse(a,L);
+    return lista2vet(L);
+}
